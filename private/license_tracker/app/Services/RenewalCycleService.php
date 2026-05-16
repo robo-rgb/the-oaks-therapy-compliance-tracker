@@ -37,6 +37,8 @@ final class RenewalCycleService
             'license_id' => $licenseId,
             'cycle_start' => (string) $data['cycle_start'],
             'cycle_end' => (string) $data['cycle_end'],
+            'required_hours' => 35.0,
+            'ethics_required_hours' => 5.0,
             'renewal_deadline' => (string) $data['renewal_deadline'],
             'late_renewal_deadline' => (string) $data['late_renewal_deadline'],
             'is_active' => $active,
@@ -56,10 +58,10 @@ final class RenewalCycleService
             }
 
             if ($id) {
-                $stmt = $pdo->prepare('UPDATE renewal_cycles SET cycle_start=:cycle_start, cycle_end=:cycle_end, renewal_deadline=:renewal_deadline, late_renewal_deadline=:late_renewal_deadline, is_active=:is_active, renewal_submitted=:renewal_submitted, renewal_submitted_date=:renewal_submitted_date, renewal_fee_paid=:renewal_fee_paid, renewal_fee_paid_date=:renewal_fee_paid_date, status=:status WHERE id=:id AND license_id=:license_id');
+                $stmt = $pdo->prepare('UPDATE renewal_cycles SET cycle_start=:cycle_start, cycle_end=:cycle_end, required_hours=:required_hours, ethics_required_hours=:ethics_required_hours, renewal_deadline=:renewal_deadline, late_renewal_deadline=:late_renewal_deadline, is_active=:is_active, renewal_submitted=:renewal_submitted, renewal_submitted_date=:renewal_submitted_date, renewal_fee_paid=:renewal_fee_paid, renewal_fee_paid_date=:renewal_fee_paid_date, status=:status WHERE id=:id AND license_id=:license_id');
                 $stmt->execute($payload + ['id' => $id]);
             } else {
-                $stmt = $pdo->prepare('INSERT INTO renewal_cycles (license_id, cycle_start, cycle_end, renewal_deadline, late_renewal_deadline, is_active, renewal_submitted, renewal_submitted_date, renewal_fee_paid, renewal_fee_paid_date, status) VALUES (:license_id,:cycle_start,:cycle_end,:renewal_deadline,:late_renewal_deadline,:is_active,:renewal_submitted,:renewal_submitted_date,:renewal_fee_paid,:renewal_fee_paid_date,:status)');
+                $stmt = $pdo->prepare('INSERT INTO renewal_cycles (license_id, cycle_start, cycle_end, required_hours, ethics_required_hours, renewal_deadline, late_renewal_deadline, is_active, renewal_submitted, renewal_submitted_date, renewal_fee_paid, renewal_fee_paid_date, status) VALUES (:license_id,:cycle_start,:cycle_end,:required_hours,:ethics_required_hours,:renewal_deadline,:late_renewal_deadline,:is_active,:renewal_submitted,:renewal_submitted_date,:renewal_fee_paid,:renewal_fee_paid_date,:status)');
                 $stmt->execute($payload);
             }
 

@@ -1,6 +1,26 @@
 /private/license_tracker/config/local.php
+/private/license_tracker/config/*.local.php
 /private/license_tracker/database/*.sqlite
+/private/license_tracker/database/*.sqlite-shm
+/private/license_tracker/database/*.sqlite-wal
+/private/license_tracker/database/*.db
 /private/license_tracker/uploads/*
 /private/license_tracker/logs/*
 /private/license_tracker/vendor/
+
+# Keep directory placeholders if you add them later
+!/private/license_tracker/uploads/.gitkeep
+!/private/license_tracker/logs/.gitkeep
+
+# Local/runtime files
 .DS_Store
+Thumbs.db
+composer.phar
+composer-setup.php
+error_log
+*.log
+
+# Temporary repair/reset scripts
+*_reset*.php
+repair_*.php
+reset_admin_password.php

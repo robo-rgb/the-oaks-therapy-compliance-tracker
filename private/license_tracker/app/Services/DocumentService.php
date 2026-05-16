@@ -32,40 +32,90 @@ final class DocumentService
 
     public function get(int $id, int $licenseId): ?array
     {
-        $stmt=Connection::get()->prepare('SELECT * FROM documents WHERE id=:id AND license_id=:license_id LIMIT 1');
+        $stmt=Connection::get()->prepare('SELECT * FROM documents WHERE id=:id$stmt = $pdo->prepare( AND license_id=:license_id LIMIT 1');
         $stmt->execute(['id'=>$id,'license_id'=>$licenseId]);
         $r=$stmt->fetch(); return $r?:null;
     }
 
     public function upload(array $data, array $file): array
-    {
-        [$errors,$warnings,$meta]=$this->validateUpload($data,$file);
-        if($errors){return ['errors'=>$errors,'warnings'=>$warnings];}
+{
+    [$errors, $warnings, $meta] = $this->validateUpload($data, $file);
 
-        $uploadDir = __DIR__ . '/../../uploads';
-        if(!is_dir($uploadDir)){mkdir($uploadDir,0750,true);}        
-        $stored=$meta['stored_filename'];
-        $target=$uploadDir.'/'.$stored;
-        if(!move_uploaded_file($file['tmp_name'],$target)){
-            return ['errors'=>['Failed to save uploaded file.'],'warnings'=>$warnings];
+    if ($errors) {
+        return ['errors' => $errors, 'warnings' => $warnings];
+    }
+
+    $uploadDir = __DIR__ . '/../../uploads';
+
+    if (!is_dir($uploadDir)) {
+        mkdir($uploadDir, 0750, true);
+    }
+
+    $stored = $meta['stored_filename'];
+    $relativePath = 'uploads/' . $stored;
+    $target = $uploadDir . '/' . $stored;
+
+    if (!move_uploaded_file($file['tmp_name'], $target)) {
+        return ['errors' => ['Failed to save uploaded file.'], 'warnings' => $warnings];
+    }
+
+    try {
+        $stmt = Connection::get()->prepare(
+            'INSERT INTO documents (
+                license_id,
+                renewal_cycle_id,
+                ce_course_id,
+                document_type,
+                title,
+                original_filename,
+                stored_filename,
+                file_path,
+                storage_path,
+                mime_type,
+                file_size,
+                uploaded_at,
+                notes
+            ) VALUES (
+                :license_id,
+                :renewal_cycle_id,
+                :ce_course_id,
+                :document_type,
+                :title,
+                :original_filename,
+                :stored_filename,
+                :file_path,
+                :storage_path,
+                :mime_type,
+                :file_size,
+                CURRENT_TIMESTAMP,
+                :notes
+            )'
+        );
+
+        $stmt->execute([
+            'license_id' => (int) $data['license_id'],
+            'renewal_cycle_id' => !empty($data['renewal_cycle_id']) ? (int) $data['renewal_cycle_id'] : null,
+            'ce_course_id' => !empty($data['ce_course_id']) ? (int) $data['ce_course_id'] : null,
+            'document_type' => $data['document_type'],
+            'title' => trim((string) $data['title']),
+            'original_filename' => $meta['original_filename'],
+            'stored_filename' => $stored,
+            'file_path' => $relativePath,
+            'storage_path' => $relativePath,
+            'mime_type' => $meta['mime_type'],
+            'file_size' => $meta['file_size'],
+            'notes' => trim((string) ($data['notes'] ?? '')),
+        ]);
+    } catch (\Throwable $exception) {
+        if (is_file($target)) {
+            unlink($target);
         }
 
-        $stmt=Connection::get()->prepare('INSERT INTO documents (license_id, renewal_cycle_id, ce_course_id, document_type, title, original_filename, stored_filename, file_path, mime_type, file_size, uploaded_at, notes) VALUES (:license_id,:renewal_cycle_id,:ce_course_id,:document_type,:title,:original_filename,:stored_filename,:file_path,:mime_type,:file_size,CURRENT_TIMESTAMP,:notes)');
-        $stmt->execute([
-            'license_id'=>(int)$data['license_id'],
-            'renewal_cycle_id'=>!empty($data['renewal_cycle_id'])?(int)$data['renewal_cycle_id']:null,
-            'ce_course_id'=>!empty($data['ce_course_id'])?(int)$data['ce_course_id']:null,
-            'document_type'=>$data['document_type'],
-            'title'=>trim((string)$data['title']),
-            'original_filename'=>$meta['original_filename'],
-            'stored_filename'=>$stored,
-            'file_path'=>'uploads/'.$stored,
-            'mime_type'=>$meta['mime_type'],
-            'file_size'=>$meta['file_size'],
-            'notes'=>trim((string)($data['notes']??'')),
-        ]);
-        return ['errors'=>[],'warnings'=>$warnings];
+        throw $exception;
     }
+
+    return ['errors' => [], 'warnings' => $warnings];
+}
 
     public function delete(int $id, int $licenseId): bool
     {
