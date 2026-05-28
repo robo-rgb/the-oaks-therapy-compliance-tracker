@@ -41,6 +41,33 @@ $cycleById = [];
 foreach ($cycles as $cc) {
     $cycleById[(int) $cc['id']] = $cc;
 }
+
+$activeFilterLabels = [];
+
+if (!empty($filters['renewal_cycle_id'])) {
+    $filterCycleId = (int) $filters['renewal_cycle_id'];
+
+    if (isset($cycleById[$filterCycleId])) {
+        $filterCycle = $cycleById[$filterCycleId];
+        $activeFilterLabels[] = 'renewal cycle ' . $filterCycle['cycle_start'] . ' to ' . $filterCycle['cycle_end'];
+    } else {
+        $activeFilterLabels[] = 'selected renewal cycle';
+    }
+}
+
+if ($filters['category'] !== '') {
+    $activeFilterLabels[] = 'category "' . $filters['category'] . '"';
+}
+
+if ($filters['delivery_mode'] !== '') {
+    $activeFilterLabels[] = 'delivery mode "' . $filters['delivery_mode'] . '"';
+}
+
+if ($filters['q'] !== '') {
+    $activeFilterLabels[] = 'search "' . $filters['q'] . '"';
+}
+
+$resultCount = count($courses);
 ?>
 <!doctype html>
 <html>
@@ -112,6 +139,22 @@ foreach ($cycles as $cc) {
 
         <button type="submit">Filter</button>
     </form>
+
+        <p>
+        <strong>Search results:</strong>
+        <?= (int) $resultCount ?>
+        <?= $resultCount === 1 ? 'CE course found' : 'CE courses found' ?>
+
+        <?php if ($activeFilterLabels): ?>
+            for <?= e(implode(', ', $activeFilterLabels)) ?>.
+        <?php else: ?>
+            across all filters.
+        <?php endif; ?>
+
+        <?php if ($activeFilterLabels): ?>
+            <a href="<?= e(app_base_path('ce/index.php')) ?>">Clear filters</a>
+        <?php endif; ?>
+    </p>
 
     <table border="1">
         <tr>
@@ -191,8 +234,13 @@ foreach ($cycles as $cc) {
     </table>
 
     <?php if (!$courses): ?>
-        <p>No CE courses found.</p>
-    <?php endif; ?>
+    <p>
+        No CE courses match the selected filters.
+        <a href="<?= e(app_base_path('ce/create.php')) ?>">Add a CE course</a>
+        or
+        <a href="<?= e(app_base_path('ce/index.php')) ?>">clear filters</a>.
+    </p>
+<?php endif; ?>
 
 <?php endif; ?>
 </body>
