@@ -35,19 +35,19 @@ final class CeCourseService
     public function list(array $filters): array
     {
         $sql = 'SELECT * FROM ce_courses WHERE license_id = :license_id';
-        $params = ['license_id' => (int)$filters['license_id']];
+        $params = ['license_id' => (int) $filters['license_id']];
 
         if (!empty($filters['renewal_cycle_id'])) {
             $sql .= ' AND renewal_cycle_id = :renewal_cycle_id';
-            $params['renewal_cycle_id'] = (int)$filters['renewal_cycle_id'];
+            $params['renewal_cycle_id'] = (int) $filters['renewal_cycle_id'];
         }
         if (!empty($filters['category'])) {
             $sql .= ' AND category = :category';
-            $params['category'] = (string)$filters['category'];
+            $params['category'] = (string) $filters['category'];
         }
         if (!empty($filters['delivery_mode'])) {
             $sql .= ' AND delivery_mode = :delivery_mode';
-            $params['delivery_mode'] = (string)$filters['delivery_mode'];
+            $params['delivery_mode'] = (string) $filters['delivery_mode'];
         }
         if (!empty($filters['q'])) {
             $sql .= ' AND (course_title LIKE :q OR provider_name LIKE :q)';
@@ -55,6 +55,7 @@ final class CeCourseService
         }
 
         $sql .= ' ORDER BY date_completed DESC, id DESC';
+
         $stmt = Connection::get()->prepare($sql);
         $stmt->execute($params);
         return $stmt->fetchAll();
@@ -72,13 +73,14 @@ final class CeCourseService
     {
         [$errors, $warnings] = $this->validate($data);
         if ($errors) {
-            return ['errors' => $errors, 'warnings' => $warnings];
+            return ['errors' => $errors, 'warnings' => $warnings, 'id' => null];
         }
 
-        $stmt = Connection::get()->prepare('INSERT INTO ce_courses (license_id, renewal_cycle_id, course_title, provider_name, date_completed, hours, category, format, delivery_mode, approval_source, counts_toward_cycle, is_professional_conference, notes, created_at) VALUES (:license_id,:renewal_cycle_id,:course_title,:provider_name,:date_completed,:hours,:category,:format,:delivery_mode,:approval_source,:counts_toward_cycle,:is_professional_conference,:notes,CURRENT_TIMESTAMP)');
+        $pdo = Connection::get();
+        $stmt = $pdo->prepare('INSERT INTO ce_courses (license_id, renewal_cycle_id, course_title, provider_name, date_completed, hours, category, format, delivery_mode, approval_source, counts_toward_cycle, is_professional_conference, notes, created_at) VALUES (:license_id,:renewal_cycle_id,:course_title,:provider_name,:date_completed,:hours,:category,:format,:delivery_mode,:approval_source,:counts_toward_cycle,:is_professional_conference,:notes,CURRENT_TIMESTAMP)');
         $stmt->execute($this->payload($data));
 
-        return ['errors' => [], 'warnings' => $warnings];
+        return ['errors' => [], 'warnings' => $warnings, 'id' => (int) $pdo->lastInsertId()];
     }
 
     public function update(int $id, int $licenseId, array $data): array

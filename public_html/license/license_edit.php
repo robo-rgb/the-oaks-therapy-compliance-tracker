@@ -17,7 +17,12 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
  }
 }
 ?>
-<!doctype html><html><body><h1><?= $license?'Edit':'Create' ?> License Profile</h1>
+<!doctype html>
+<html>
+<body>
+<?php require __DIR__ . '/_auth_nav.php'; ?>
+
+<h1><?= $license ? 'Edit' : 'Create' ?> License Profile</h1>
 <?php foreach($errors as $e1): ?><p style="color:red"><?= e($e1) ?></p><?php endforeach; ?>
 <form method="post" action="<?= e(app_base_path('license_edit.php')) ?>"><?= csrf_input() ?>
 <input name="licensee_first_name" value="<?= e($data['licensee_first_name']) ?>" placeholder="First name" required><br>

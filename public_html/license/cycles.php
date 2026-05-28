@@ -8,7 +8,7 @@ $licenseService = new App\Services\LicenseService();
 $license = $licenseService->getByUserId($userId);
 ?>
 <!doctype html><html><body>
-<nav><a href="<?= e(app_base_path('dashboard.php')) ?>">Dashboard</a> | <a href="<?= e(app_base_path('license.php')) ?>">License Profile</a> | <a href="<?= e(app_base_path('cycles.php')) ?>">Renewal Cycles</a>
+<?php require __DIR__ . '/_auth_nav.php'; ?>
 <form style="display:inline" method="post" action="<?= e(app_base_path('logout.php')) ?>"><?= csrf_input() ?><button>Logout</button></form></nav>
 <h1>Renewal Cycles</h1>
 <?php if (!$license): ?>
