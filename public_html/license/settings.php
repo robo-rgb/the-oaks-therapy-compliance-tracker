@@ -34,7 +34,12 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
  }
 }
 ?>
-<!doctype html><html><body><h1>Settings</h1><?php if($msg):?><p><?= e($msg) ?></p><?php endif; ?><?php if($err):?><p style="color:red"><?= e($err) ?></p><?php endif; ?>
+<!doctype html>
+<html>
+<body>
+<?php require __DIR__ . '/_auth_nav.php'; ?>
+
+<h1>Settings</h1><?php if($msg):?><p><?= e($msg) ?></p><?php endif; ?><?php if($err):?><p style="color:red"><?= e($err) ?></p><?php endif; ?>
 <p>SMTP config present: <?= $emailSvc->smtpPresent()?'Yes':'No' ?> (password hidden)</p>
 <form method="post"><?= csrf_input() ?>
 <input name="app_name" value="<?= e((string)($settings['app_name']??'')) ?>" placeholder="App name"><br>

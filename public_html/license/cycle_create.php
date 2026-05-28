@@ -10,7 +10,12 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
  if(!verify_csrf_token($_POST['_csrf_token']??null)){$errors[]='Invalid request token.';} else { $data=array_merge($data,$_POST); $errors=$svc->save((int)$license['id'],$data,null); if(!$errors)redirect('cycles.php'); }
 }
 ?>
-<!doctype html><html><body><h1>Create Cycle</h1><?php foreach($errors as $e1):?><p style="color:red"><?= e($e1) ?></p><?php endforeach;?><form method="post"><?= csrf_input() ?>
+<!doctype html>
+<html>
+<body>
+<?php require __DIR__ . '/_auth_nav.php'; ?>
+
+<h1><?= $license ? 'Edit' : 'Create' ?> Create Cycle </h1><?php foreach($errors as $e1):?><p style="color:red"><?= e($e1) ?></p><?php endforeach;?><form method="post"><?= csrf_input() ?>
 <input name="cycle_start" value="<?= e($data['cycle_start']) ?>" required><br><input name="cycle_end" value="<?= e($data['cycle_end']) ?>" required><br>
 <input name="renewal_deadline" value="<?= e($data['renewal_deadline']) ?>" required><br><input name="late_renewal_deadline" value="<?= e($data['late_renewal_deadline']) ?>" required><br>
 <label><input type="checkbox" name="is_active" value="1" <?= !empty($data['is_active'])?'checked':'' ?>> Active</label><br>
