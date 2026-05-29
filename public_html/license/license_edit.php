@@ -38,107 +38,124 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 <!doctype html>
-<html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title><?= $license ? 'Edit' : 'Create' ?> License Profile - The Oaks Therapy</title>
+</head>
 <body>
 <?php require __DIR__ . '/_auth_nav.php'; ?>
 
-<h1><?= $license ? 'Edit' : 'Create' ?> License Profile</h1>
+<main id="main-content" class="page-shell page-shell--narrow">
+    <div class="page-header">
+        <div class="page-header__content">
+            <p class="page-eyebrow">License profile</p>
+            <h1><?= $license ? 'Edit' : 'Create' ?> License Profile</h1>
+            <p class="page-subtitle">Maintain the licensee details used throughout renewal tracking, CE reports, and reminders.</p>
+        </div>
+        <div class="page-header__actions">
+            <a class="button button--secondary" href="<?= e(app_base_path('license.php')) ?>">Back to Profile</a>
+        </div>
+    </div>
 
-<?php foreach ($errors as $error): ?>
-    <p style="color:red"><?= e($error) ?></p>
-<?php endforeach; ?>
+    <?php foreach ($errors as $error): ?>
+        <p class="error"><?= e($error) ?></p>
+    <?php endforeach; ?>
 
-<form method="post" action="<?= e(app_base_path('license_edit.php')) ?>">
-    <?= csrf_input() ?>
+    <section class="panel">
+        <div class="card__header">
+            <div>
+                <h2 class="card__title">Licensee information</h2>
+                <p class="card__subtitle">Required fields are used for compliance summaries and audit-ready records.</p>
+            </div>
+        </div>
 
-    <p>
-        <label>
-            First name<br>
-            <input
-                name="licensee_first_name"
-                value="<?= e((string) $data['licensee_first_name']) ?>"
-                required
-            >
-        </label>
-    </p>
+        <form method="post" action="<?= e(app_base_path('license_edit.php')) ?>">
+            <?= csrf_input() ?>
 
-    <p>
-        <label>
-            Last name<br>
-            <input
-                name="licensee_last_name"
-                value="<?= e((string) $data['licensee_last_name']) ?>"
-                required
-            >
-        </label>
-    </p>
+            <div class="grid">
+                <div class="field">
+                    <label for="licensee_first_name">First name</label>
+                    <input
+                        id="licensee_first_name"
+                        name="licensee_first_name"
+                        value="<?= e((string) $data['licensee_first_name']) ?>"
+                        required
+                    >
+                </div>
 
-    <p>
-        <label>
-            License type<br>
-            <input
-                name="license_type"
-                value="<?= e((string) $data['license_type']) ?>"
-                required
-            >
-        </label>
-    </p>
+                <div class="field">
+                    <label for="licensee_last_name">Last name</label>
+                    <input
+                        id="licensee_last_name"
+                        name="licensee_last_name"
+                        value="<?= e((string) $data['licensee_last_name']) ?>"
+                        required
+                    >
+                </div>
 
-    <p>
-        <label>
-            State<br>
-            <input
-                name="state"
-                value="<?= e((string) $data['state']) ?>"
-                required
-            >
-        </label>
-    </p>
+                <div class="field">
+                    <label for="license_type">License type</label>
+                    <input
+                        id="license_type"
+                        name="license_type"
+                        value="<?= e((string) $data['license_type']) ?>"
+                        required
+                    >
+                </div>
 
-    <p>
-        <label>
-            License number<br>
-            <input
-                name="license_number"
-                value="<?= e((string) $data['license_number']) ?>"
-                required
-            >
-        </label>
-    </p>
+                <div class="field">
+                    <label for="state">State</label>
+                    <input
+                        id="state"
+                        name="state"
+                        value="<?= e((string) $data['state']) ?>"
+                        required
+                    >
+                </div>
 
-    <p>
-        <label>
-            Original issue date<br>
-            <input
-                name="original_issue_date"
-                type="date"
-                value="<?= e((string) $data['original_issue_date']) ?>"
-            >
-        </label>
-    </p>
+                <div class="field">
+                    <label for="license_number">License number</label>
+                    <input
+                        id="license_number"
+                        name="license_number"
+                        value="<?= e((string) $data['license_number']) ?>"
+                        required
+                    >
+                </div>
 
-    <p>
-        <label>
-            Status<br>
-            <select name="status" required>
-                <option value="active" <?= (string) $data['status'] === 'active' ? 'selected' : '' ?>>Active</option>
-                <option value="inactive" <?= (string) $data['status'] === 'inactive' ? 'selected' : '' ?>>Inactive</option>
-                <option value="expired" <?= (string) $data['status'] === 'expired' ? 'selected' : '' ?>>Expired</option>
-            </select>
-        </label>
-    </p>
+                <div class="field">
+                    <label for="original_issue_date">Original issue date</label>
+                    <input
+                        id="original_issue_date"
+                        name="original_issue_date"
+                        type="date"
+                        value="<?= e((string) $data['original_issue_date']) ?>"
+                    >
+                </div>
 
-    <p>
-        <label>
-            Notes<br>
-            <textarea name="notes"><?= e((string) $data['notes']) ?></textarea>
-        </label>
-    </p>
+                <div class="field">
+                    <label for="status">Status</label>
+                    <select id="status" name="status" required>
+                        <option value="active" <?= (string) $data['status'] === 'active' ? 'selected' : '' ?>>Active</option>
+                        <option value="inactive" <?= (string) $data['status'] === 'inactive' ? 'selected' : '' ?>>Inactive</option>
+                        <option value="expired" <?= (string) $data['status'] === 'expired' ? 'selected' : '' ?>>Expired</option>
+                    </select>
+                </div>
 
-    <p>
-        <button type="submit">Save</button>
-    </p>
-</form>
+                <div class="field full">
+                    <label for="notes">Notes</label>
+                    <textarea id="notes" name="notes"><?= e((string) $data['notes']) ?></textarea>
+                </div>
+            </div>
+
+            <div class="button-row">
+                <button type="submit">Save License Profile</button>
+                <a class="button button--secondary" href="<?= e(app_base_path('license.php')) ?>">Cancel</a>
+            </div>
+        </form>
+    </section>
+</main>
 
 </body>
 </html>
